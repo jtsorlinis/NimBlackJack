@@ -1,8 +1,5 @@
-import card
-import deck
+import cardpile
 
-var d = newDeck()
-d.shuffle()
-echo d.print()
-
-echo "hello world";
+var cp = newCardPile(5)
+cp.shuffle()
+echo cp.print()

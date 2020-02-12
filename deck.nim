@@ -6,7 +6,7 @@ let ranks = @["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
 
 type
     Deck* = object
-        mCards: seq[Card]
+        mCards: seq[ref Card]
 
 proc newDeck*(): ref Deck =
     let d = new Deck

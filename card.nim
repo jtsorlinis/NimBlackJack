@@ -9,7 +9,7 @@ type
         mCount*: int32
         mIsAce: bool
 
-proc evaluate(self: Card): int32 =
+proc evaluate(self: ref Card): int32 =
     if self.mRank == "J" or self.mRank == "Q" or self.mRank == "K":
         result = 10
     elif self.mRank == "A":
@@ -17,7 +17,7 @@ proc evaluate(self: Card): int32 =
     else:
         result = int32(parseInt(self.mRank))
 
-proc count(self: Card): int32 =
+proc count(self: ref Card): int32 =
     if self.mRank == "10" or self.mRank == "J" or self.mRank == "Q" or self.mRank == "K" or self.mRank == "A":
         result = -1
     elif self.mRank == "7" or self.mRank == "8" or self.mRank == "9":
@@ -25,15 +25,17 @@ proc count(self: Card): int32 =
     else:
         result = 1
 
-proc newCard*(rank: string, suit: string): Card =
-    result.mRank = rank
-    result.mSuit = suit
-    result.mFaceDown = false
-    result.mValue = result.evaluate()
-    result.mCount = result.count()
-    result.mIsAce = false
+proc newCard*(rank: string, suit: string): ref Card =
+    let c = new Card
+    c.mRank = rank
+    c.mSuit = suit
+    c.mFaceDown = false
+    c.mValue = c.evaluate()
+    c.mCount = c.count()
+    c.mIsAce = false
+    result = c
 
-proc print*(self: Card): string =
+proc print*(self: ref Card): string =
     if self.mFaceDown:
         result = "X"
     else:

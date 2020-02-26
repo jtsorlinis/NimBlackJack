@@ -146,6 +146,98 @@ proc newTable*(numPlayers: int32, numDecks: int32, betSize: int32, minCards: int
     for i in 0..numPlayers:
         result.mPlayers.add(newPlayer(result))
 
+proc dealRound(self: Table) =
+    #TODO
+    return
+
+proc evaluateAll(self: Table) =
+    #TODO
+    return
+
+proc deal(self: Table) =
+    #TODO
+    return
+
+proc preDeal(self: Table) =
+    #TODO
+    return
+
+proc selectBet(self: Table, player: Player) =
+    #TODO
+    return
+
+proc dealDealer(self: Table, facedown: bool = false) =
+    #TODO
+    return
+
+proc startRound(self: Table) =
+    #TODO
+    return
+
+proc getNewCards(self: Table) =
+    #TODO
+    return
+
+proc clear(self: Table) =
+    #TODO
+    return
+
+proc updateCount(self: Table) =
+    #TODO
+    return
+
+proc hit(self: Table) =
+    #TODO
+    return
+
+proc stand(self: Table) =
+    #TODO
+    return
+
+proc split(self: Table) =
+    #TODO
+    return
+
+proc splitAces(self: Table) =
+    #TODO
+    return
+
+proc doubleBet(self: Table) =
+    #TODO
+    return
+
+proc autoPlay(self: Table) =
+    #TODO
+    return
+
+proc action(self: Table, act: string) =
+    #TODO
+    return
+
+proc dealerPlay(self: Table) =
+    #TODO
+    return
+
+proc nextPlayer(self: Table) =
+    #TODO
+    return
+
+proc checkPlayerNatural(self: Table) =
+    #TODO
+    return
+
+proc checkDealerNatural(self: Table): bool =
+    #TODO
+    return
+
+proc checkEarnings(self: Table) =
+    #TODO
+    return
+
+proc finishRound(self: Table) =
+    #TODO
+    return
+
 proc print*(self: Table) =
     for player in self.mPlayers:
         echo player.print()

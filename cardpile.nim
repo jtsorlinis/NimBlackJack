@@ -23,7 +23,7 @@ proc print*(self: CardPile): string =
     for card in self.mCards:
         result.add(card.print())
 
-proc shuffle*(self: CardPile) = 
+proc shuffle*(self: CardPile) =
     for i in 0..<self.mCards.len:
         let j = rand(i)
         self.mCards[i].swap(self.mCards[j])

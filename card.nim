@@ -17,7 +17,8 @@ proc evaluate(self: Card): int32 =
         result = int32(parseInt(self.mRank))
 
 proc count(self: Card): int32 =
-    if self.mRank == "10" or self.mRank == "J" or self.mRank == "Q" or self.mRank == "K" or self.mRank == "A":
+    if self.mRank == "10" or self.mRank == "J" or self.mRank == "Q" or
+            self.mRank == "K" or self.mRank == "A":
         result = -1
     elif self.mRank == "7" or self.mRank == "8" or self.mRank == "9":
         result = 0
@@ -38,4 +39,4 @@ proc print*(self: Card): string =
         result = "X"
     else:
         result = self.mRank
-    
+

@@ -10,4 +10,4 @@ proc newDeck*(): Deck =
     new result
     for suit in suits:
         for rank in ranks:
-            result.mCards.add(newCard(rank,suit))
+            result.mCards.add(newCard(rank, suit))

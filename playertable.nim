@@ -149,6 +149,12 @@ proc newTable*(numPlayers: int32, numDecks: int32, betSize: int32,
     for i in 0..<numPlayers:
         result.mPlayers.add(newPlayer(result))
 
+proc print*(self: Table) =
+    for player in self.mPlayers:
+        echo player.print()
+    echo self.mDealer.print()
+    echo ""
+
 proc deal(self: Table) =
     var card = self.mCardPile.mCards.pop()
     self.mPlayers[self.mCurrentPlayer].mHand.add(card)
@@ -203,20 +209,43 @@ proc updateCount(self: Table) =
         self.mTruecount = self.mRunningcount div int32(self.mCardPile.mCards.len() div 52)
 
 proc hit(self: Table) =
-    #TODO
-    return
+    self.deal()
+    self.mPlayers[self.mCurrentPlayer].evaluate()
+    if self.mVerbose:
+        echo "Player " & self.mPlayers[self.mCurrentPlayer].mPlayerNum & " hits"
 
 proc stand(self: Table) =
-    #TODO
-    return
+    if self.mVerbose and self.mPlayers[self.mCurrentPlayer].mValue <= 21:
+        echo "Player " & self.mPlayers[self.mCurrentPlayer].mPlayerNum & " stands"
+        self.print()
+    self.mPlayers[self.mCurrentPlayer].mIsDone = true
+
 
 proc split(self: Table) =
-    #TODO
-    return
+    var splitPlayer = newPlayer(self, self.mPlayers[self.mCurrentPlayer])
+    discard self.mPlayers[self.mCurrentPlayer].mHand.pop()
+    self.mPlayers.insert(splitPlayer, self.mCurrentPlayer+1)
+    self.mPlayers[self.mCurrentPlayer].evaluate()
+    self.mPlayers[self.mCurrentPlayer+1].evaluate()
+    if self.mVerbose:
+        echo "Player " & self.mPlayers[self.mCurrentPlayer].mPlayerNum & " splits"
 
 proc splitAces(self: Table) =
-    #TODO
-    return
+    if self.mVerbose:
+        echo "Player " & self.mPlayers[self.mCurrentPlayer].mPlayerNum & " splits Aces"
+    var splitPlayer = newPlayer(self, self.mPlayers[self.mCurrentPlayer])
+    discard self.mPlayers[self.mCurrentPlayer].mHand.pop()
+    self.mPlayers.insert(splitPlayer, self.mCurrentPlayer+1)
+    self.deal()
+    self.mPlayers[self.mCurrentPlayer].evaluate()
+    self.stand()
+    self.mCurrentPlayer += 1
+    self.deal()
+    self.mPlayers[self.mCurrentPlayer].evaluate()
+    self.stand()
+    if self.mVerbose:
+        self.print()
+    
 
 proc doubleBet(self: Table) =
     #TODO
@@ -253,12 +282,6 @@ proc checkEarnings(self: Table) =
 proc finishRound(self: Table) =
     #TODO
     return
-
-proc print*(self: Table) =
-    for player in self.mPlayers:
-        echo player.print()
-    echo self.mDealer.print()
-    echo ""
 
 proc startRound*(self: Table) =
     self.clear()

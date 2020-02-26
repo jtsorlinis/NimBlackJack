@@ -1,24 +1,58 @@
-import table
 import card
+import cardpile
 
 var playerNumCount = 0
 let maxSplits = 10
 
-type Player* = ref object
-    mTable: Table
-    mHand: seq[Card]
-    mSplitFrom: Player
-    mAces: int32
-    mSplitcount: int32
-    mBetMult: float32
-    mEarnings: float32
-    mHasNatural: bool
-    mInitialBet: int32
-    mIsDone: bool
-    mIsSoft: bool
-    mPlayerNum*: string
-    mValue*: int32
+type 
+    Table* = ref object
+        mDealer: Dealer
+        mMincards: int32
+        mNumOfDecks: int32
+        mStratHard: bool
+        mStratSoft: bool
+        mStratSplit: bool
+        mVerbose: bool
+        mBetSize*: int32
+        mCardPile: CardPile
+        mPlayers: seq[Player]
+        mCurrentPlayer: int32
+        mRunningcount: int32
+        mTruecount: int32
+        mCasinoEarnings*: float32
 
+    Player* = ref object of RootObj
+        mTable: Table
+        mHand: seq[Card]
+        mSplitFrom: Player
+        mAces: int32
+        mSplitcount: int32
+        mBetMult: float32
+        mEarnings: float32
+        mHasNatural: bool
+        mInitialBet: int32
+        mIsDone: bool
+        mIsSoft: bool
+        mPlayerNum*: string
+        mValue*: int32
+    
+    Dealer* = ref object of Player
+
+# Dealer Methods
+proc newDealer(): Dealer =
+    new result
+    result.mPlayerNum = "D"
+    result.mValue = 0
+
+proc resetHand(self: Dealer) =
+    #TODO: see if this or setlen(0) is faster
+    self.mHand = @[]
+    self.mValue = 0
+
+proc upCard(self: Dealer): int32 =
+    return self.mHand[0].mValue
+
+# Player Methods
 proc newPlayer*(table: Table = nil, split: Player = nil): Player =
     new result
     result.mTable = table
@@ -79,8 +113,9 @@ proc print*(self: Player): string =
         output.add(" (Bust) ")
     else:
         output.add("        ")
-    let val = float32(self.mInitialBet) * self.mBetMult
-    output.add("\tBet: " & $val)
+    if self.mPlayerNum != "D":
+        let val = float32(self.mInitialBet) * self.mBetMult
+        output.add("\tBet: " & $val)
     return output
 
 proc evaluate*(self: Player) =
@@ -96,3 +131,22 @@ proc evaluate*(self: Player) =
         self.mValue -= 10
         self.mAces -= 1
     self.mIsSoft = self.mAces != 0
+
+
+# Table methods
+proc newTable*(numPlayers: int32, numDecks: int32, betSize: int32, minCards: int32, verbose:bool): Table =
+    new result
+    result.mCardPile = newCardPile(numDecks)
+    result.mVerbose = verbose
+    result.mBetSize = betSize
+    result.mNumOfDecks = numDecks
+    result.mMincards = minCards
+    result.mDealer = newDealer()
+
+    for i in 0..numPlayers:
+        result.mPlayers.add(newPlayer(result))
+
+proc print*(self: Table) =
+    for player in self.mPlayers:
+        echo player.print()
+    echo self.mDealer.print()

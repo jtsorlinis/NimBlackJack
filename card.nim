@@ -1,13 +1,12 @@
 import strutils
 
-type
-    Card* = ref object
-        mRank: string
-        mSuit: string
-        mFaceDown: bool
-        mValue*: int32
-        mCount*: int32
-        mIsAce: bool
+type Card* = ref object
+    mRank*: string
+    mSuit: string
+    mFaceDown: bool
+    mValue*: int32
+    mCount*: int32
+    mIsAce*: bool
 
 proc evaluate(self: Card): int32 =
     if self.mRank == "J" or self.mRank == "Q" or self.mRank == "K":

@@ -4,7 +4,7 @@ import cardpile
 var playerNumCount = 0
 let maxSplits = 10
 
-type 
+type
     Table* = ref object
         mDealer: Dealer
         mMincards: int32
@@ -35,7 +35,7 @@ type
         mIsSoft: bool
         mPlayerNum*: string
         mValue*: int32
-    
+
     Dealer* = ref object of Player
 
 # Dealer Methods
@@ -56,7 +56,7 @@ proc upCard(self: Dealer): int32 =
 proc newPlayer*(table: Table = nil, split: Player = nil): Player =
     new result
     result.mTable = table
-    if table == nil: 
+    if table == nil:
         return
     result.mInitialBet = result.mTable.mBetSize
     if split != nil:
@@ -69,7 +69,7 @@ proc newPlayer*(table: Table = nil, split: Player = nil): Player =
         result.mPlayerNum = $playerNumCount
 
 proc doubleBet(self: Player) =
-    self.mBetMult = 2 
+    self.mBetMult = 2
 
 proc resetHand*(self: Player) =
     #TODO: see if this or setlen(0) is faster
@@ -84,7 +84,8 @@ proc resetHand*(self: Player) =
     self.mInitialBet = self.mTable.mBetSize
 
 proc canSplit(self: Player): int32 =
-    if self.mHand.len() == 2 and self.mHand[0].mRank == self.mHand[1].mRank and self.mSplitcount < maxSplits:
+    if self.mHand.len() == 2 and self.mHand[0].mRank == self.mHand[1].mRank and
+            self.mSplitcount < maxSplits:
         return self.mHand[0].mValue
     return 0
 
@@ -93,7 +94,8 @@ proc win(self: Player, mult: float32 = 1) =
         self.mSplitFrom.win(mult)
     else:
         self.mEarnings += float32(self.mInitialBet) * self.mBetMult * mult
-        self.mTable.mCasinoEarnings -= float32(self.mInitialBet) * self.mBetMult * mult
+        self.mTable.mCasinoEarnings -= float32(self.mInitialBet) *
+                self.mBetMult * mult
 
 proc lose(self: Player) =
     if self.mSplitFrom != nil:
@@ -134,7 +136,8 @@ proc evaluate*(self: Player) =
 
 
 # Table methods
-proc newTable*(numPlayers: int32, numDecks: int32, betSize: int32, minCards: int32, verbose:bool): Table =
+proc newTable*(numPlayers: int32, numDecks: int32, betSize: int32,
+        minCards: int32, verbose: bool): Table =
     new result
     result.mCardPile = newCardPile(numDecks)
     result.mVerbose = verbose
@@ -158,24 +161,23 @@ proc dealRound(self: Table) =
     self.mCurrentPlayer = 0
 
 proc evaluateAll(self: Table) =
-    #TODO
-    return
-
-proc preDeal(self: Table) =
-    #TODO
-    return
+    for player in self.mPlayers:
+        player.evaluate()
 
 proc selectBet(self: Table, player: Player) =
-    #TODO
-    return
+    if self.mTruecount >= 2:
+        player.mInitialBet = self.mBetSize * (self.mTruecount - 1)
+
+proc preDeal(self: Table) =
+    for player in self.mPlayers:
+        self.selectBet(player)
 
 proc dealDealer(self: Table, facedown: bool = false) =
-    #TODO
-    return
-
-proc startRound*(self: Table) =
-    #TODO
-    return
+    var card = self.mCardPile.mCards.pop()
+    card.mFaceDown = facedown
+    self.mDealer.mHand.add(card)
+    if not facedown:
+        self.mRunningcount += card.mCount
 
 proc getNewCards(self: Table) =
     #TODO
@@ -245,3 +247,27 @@ proc print*(self: Table) =
     for player in self.mPlayers:
         echo player.print()
     echo self.mDealer.print()
+    echo ""
+
+proc startRound*(self: Table) =
+    self.clear()
+    self.updateCount()
+    if self.mVerbose:
+        echo $self.mCardPile.mCards.len() & " cards left"
+        echo "Running count is: " & $self.mRunningcount & "\tTrue count is: " &
+                $self.mTruecount
+    self.getNewCards()
+    self.preDeal()
+    self.dealRound()
+    self.dealDealer()
+    self.dealRound()
+    self.dealDealer(true)
+    self.evaluateAll()
+    self.mCurrentPlayer = 0
+    if self.checkDealerNatural():
+        self.finishRound()
+    else:
+        self.checkPlayerNatural()
+        if self.mVerbose:
+            self.print()
+        self.autoPlay()

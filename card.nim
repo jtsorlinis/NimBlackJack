@@ -3,7 +3,7 @@ import strutils
 type Card* = ref object
     mRank*: string
     mSuit: string
-    mFaceDown: bool
+    mFaceDown*: bool
     mValue*: int32
     mCount*: int32
     mIsAce*: bool

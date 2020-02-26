@@ -180,16 +180,27 @@ proc dealDealer(self: Table, facedown: bool = false) =
         self.mRunningcount += card.mCount
 
 proc getNewCards(self: Table) =
-    #TODO
-    return
+    if self.mCardPile.mCards.len() >= self.mMincards:
+        return
+    self.mCardPile.refresh()
+    self.mCardPile.shuffle()
+    self.mTruecount = 0
+    self.mRunningcount = 0
+    if self.mVerbose:
+        echo "Got " & $self.mNumOfDecks & " new decks as number of cards left is below " & $self.mMincards
 
 proc clear(self: Table) =
-    #TODO
-    return
+    for i in countdown(self.mPlayers.len()-1, 0):
+        self.mPlayers[i].resetHand()
+        if self.mPlayers[i].mSplitFrom != nil:
+            self.mPlayers.delete(i)
+    self.mDealer.resetHand()
+    self.mCurrentPlayer = 0
+            
 
 proc updateCount(self: Table) =
-    #TODO
-    return
+    if self.mCardPile.mCards.len() > 51:
+        self.mTruecount = self.mRunningcount div int32(self.mCardPile.mCards.len() div 52)
 
 proc hit(self: Table) =
     #TODO

@@ -28,7 +28,7 @@ type
         mAces: int32
         mSplitcount: int32
         mBetMult: float32
-        mEarnings: float32
+        mEarnings*: float32
         mHasNatural: bool
         mInitialBet: int32
         mIsDone: bool
@@ -248,40 +248,110 @@ proc splitAces(self: Table) =
     
 
 proc doubleBet(self: Table) =
-    #TODO
-    return
-
-proc autoPlay(self: Table) =
-    #TODO
-    return
-
-proc action(self: Table, act: string) =
-    #TODO
-    return
-
-proc dealerPlay(self: Table) =
-    #TODO
-    return
-
-proc nextPlayer(self: Table) =
-    #TODO
-    return
-
-proc checkPlayerNatural(self: Table) =
-    #TODO
-    return
-
-proc checkDealerNatural(self: Table): bool =
-    #TODO
-    return
-
-proc checkEarnings(self: Table) =
-    #TODO
-    return
+    if self.mPlayers[self.mCurrentPlayer].mBetMult == 1 and self.mPlayers[self.mCurrentPlayer].mHand.len() == 2:
+        self.mPlayers[self.mCurrentPlayer].doubleBet()
+        if self.mVerbose:
+            echo "Player " & self.mPlayers[self.mCurrentPlayer].mPlayerNum & " doubles"
+        self.hit()
+        self.stand()
+    else:
+        self.hit()
 
 proc finishRound(self: Table) =
-    #TODO
-    return
+    if self.mVerbose:
+        echo "Scoring round"
+    for player in self.mPlayers:
+        if player.mHasNatural:
+            player.win(1.5)
+        elif player.mValue > 21:
+            player.lose()
+        elif self.mDealer.mValue > 21 or player.mValue > self.mDealer.mValue:
+            player.win()
+        elif player.mValue == self.mDealer.mValue:
+            discard
+        else:
+            player.lose()
+
+
+proc dealerPlay(self: Table) =
+    var allBusted = true
+    for player in self.mPlayers:
+        if player.mValue < 22:
+            allBusted = false
+            break
+    self.mDealer.mHand[1].mFaceDown = false
+    self.mRunningcount += self.mDealer.mHand[1].mCount
+    self.mDealer.evaluate()
+    if self.mVerbose:
+        echo "Dealer's turn"
+        self.print()
+
+    if allBusted:
+        if self.mVerbose:
+            echo "Dealer automatically wins cause all players busted"
+        self.finishRound()
+    else:
+        while self.mDealer.mValue < 17 and self.mDealer.mHand.len() < 5:
+            self.dealDealer()
+            self.mDealer.evaluate()
+            if self.mVerbose:
+                echo "Dealer hits"
+                self.print()
+        self.finishRound()
+
+
+
+proc autoPlay(self: Table) =
+    #TODO: implement strategy
+    while self.mPlayers[self.mCurrentPlayer].mValue < 17:
+        self.hit()
+    
+    # Nextplayer inline
+    self.mCurrentPlayer += 1
+    if self.mCurrentPlayer < self.mPlayers.len()-1:
+        self.autoPlay()
+    else:
+        self.dealerPlay()
+
+proc action(self: Table, act: string) =
+    case act:
+        of "H":
+            self.hit()
+        of "S":
+            self.stand()
+        of "D":
+            self.doubleBet()
+        of "P":
+            self.split()
+        else:
+            echo "No action found"
+            quit(1)
+
+proc checkPlayerNatural(self: Table) =
+    for player in self.mPlayers:
+        if player.mValue == 21 and player.mHand.len() == 2 and player.mSplitFrom == nil:
+            player.mHasNatural = true
+
+proc checkDealerNatural(self: Table): bool =
+    self.mDealer.evaluate()
+    if self.mDealer.mValue != 21:
+        return false
+    self.mDealer.mHand[1].mFaceDown = false
+    self.mRunningcount += self.mDealer.mHand[1].mCount
+    if self.mVerbose:
+        self.print()
+        echo "Dealer has a natural 21"
+    return true
+
+proc checkEarnings(self: Table) =
+    var check = 0.0
+    for player in self.mPlayers:
+        check += player.mEarnings
+    if check * -1 == self.mCasinoEarnings:
+        return
+    echo "Earnings don't match"
+    quit(1)
+
 
 proc startRound*(self: Table) =
     self.clear()

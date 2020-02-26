@@ -15,7 +15,7 @@ type
         mVerbose: bool
         mBetSize*: int32
         mCardPile*: CardPile
-        mPlayers: seq[Player]
+        mPlayers*: seq[Player]
         mCurrentPlayer: int32
         mRunningcount: int32
         mTruecount: int32
@@ -195,7 +195,7 @@ proc getNewCards(self: Table) =
     if self.mVerbose:
         echo "Got " & $self.mNumOfDecks & " new decks as number of cards left is below " & $self.mMincards
 
-proc clear(self: Table) =
+proc clear*(self: Table) =
     for i in countdown(self.mPlayers.len()-1, 0):
         self.mPlayers[i].resetHand()
         if self.mPlayers[i].mSplitFrom != nil:
@@ -343,7 +343,7 @@ proc checkDealerNatural(self: Table): bool =
         echo "Dealer has a natural 21"
     return true
 
-proc checkEarnings(self: Table) =
+proc checkEarnings*(self: Table) =
     var check = 0.0
     for player in self.mPlayers:
         check += player.mEarnings

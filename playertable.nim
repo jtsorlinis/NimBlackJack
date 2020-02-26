@@ -45,8 +45,7 @@ proc newDealer(): Dealer =
     result.mValue = 0
 
 proc resetHand(self: Dealer) =
-    #TODO: see if this or setlen(0) is faster
-    self.mHand = @[]
+    self.mHand.setLen(0)
     self.mValue = 0
 
 proc upCard(self: Dealer): int32 =
@@ -72,8 +71,7 @@ proc doubleBet(self: Player) =
     self.mBetMult = 2
 
 proc resetHand*(self: Player) =
-    #TODO: see if this or setlen(0) is faster
-    self.mHand = @[]
+    self.mHand.setLen(0)
     self.mValue = 0
     self.mAces = 0
     self.mIsSoft = false

@@ -3,24 +3,23 @@ import deck
 import random
 
 type
-    CardPile* = object
-        mCards: seq[ref Card]
-        mOriginalCards: seq[ref Card]
+    CardPile* = ref object
+        mCards: seq[Card]
+        mOriginalCards: seq[Card]
 
-proc newCardPile*(numofdecks: int32): ref CardPile =
+proc newCardPile*(numofdecks: int32): CardPile =
     randomize()
-    let cp = new CardPile
+    new result
     for x in 0..numofdecks:
         let temp = newDeck()
-        add(cp.mCards,temp.mCards)
-    result = cp
+        add(result.mCards,temp.mCards)
 
-proc print*(self: ref CardPile): string =
+proc print*(self: CardPile): string =
     result = ""
     for card in self.mCards:
         add(result,card.print())
 
-proc shuffle*(self: ref CardPile) = 
+proc shuffle*(self: CardPile) = 
     for i in 0..<self.mCards.len:
         let j = rand(i)
         swap(self.mCards[i], self.mCards[j])

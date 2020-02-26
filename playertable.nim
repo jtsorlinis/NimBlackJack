@@ -14,7 +14,7 @@ type
         mStratSplit: bool
         mVerbose: bool
         mBetSize*: int32
-        mCardPile: CardPile
+        mCardPile*: CardPile
         mPlayers: seq[Player]
         mCurrentPlayer: int32
         mRunningcount: int32
@@ -106,7 +106,7 @@ proc print*(self: Player): string =
     var output = "Player " & self.mPlayerNum & ": "
     for card in self.mHand:
         output.add(card.print() & " ")
-    for i in self.mHand.len()..5:
+    for i in self.mHand.len()..<5:
         output.add("  ")
     output.add("\tScore: " & $self.mValue)
     if self.mValue > 21:
@@ -143,18 +143,21 @@ proc newTable*(numPlayers: int32, numDecks: int32, betSize: int32, minCards: int
     result.mMincards = minCards
     result.mDealer = newDealer()
 
-    for i in 0..numPlayers:
+    for i in 0..<numPlayers:
         result.mPlayers.add(newPlayer(result))
 
+proc deal(self: Table) =
+    var card = self.mCardPile.mCards.pop()
+    self.mPlayers[self.mCurrentPlayer].mHand.add(card)
+    self.mRunningcount += card.mCount
+
 proc dealRound(self: Table) =
-    #TODO
-    return
+    for player in self.mPlayers:
+        self.deal()
+        self.mCurrentPlayer += 1
+    self.mCurrentPlayer = 0
 
 proc evaluateAll(self: Table) =
-    #TODO
-    return
-
-proc deal(self: Table) =
     #TODO
     return
 
@@ -170,7 +173,7 @@ proc dealDealer(self: Table, facedown: bool = false) =
     #TODO
     return
 
-proc startRound(self: Table) =
+proc startRound*(self: Table) =
     #TODO
     return
 

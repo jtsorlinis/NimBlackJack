@@ -1,6 +1,5 @@
 import card
 import deck
-import random
 import xorshift
 import times
 

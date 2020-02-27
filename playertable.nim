@@ -1,5 +1,6 @@
 import card
 import cardpile
+import strategies
 
 var playerNumCount = 0
 let maxSplits = 10
@@ -9,9 +10,9 @@ type
         mDealer: Dealer
         mMincards: int32
         mNumOfDecks: int32
-        mStratHard: bool
-        mStratSoft: bool
-        mStratSplit: bool
+        mStratHard: seq[string]
+        mStratSoft: seq[string]
+        mStratSplit: seq[string]
         mVerbose: bool
         mBetSize*: int32
         mCardPile*: CardPile
@@ -143,6 +144,9 @@ proc newTable*(numPlayers: int32, numDecks: int32, betSize: int32,
     result.mNumOfDecks = numDecks
     result.mMincards = minCards
     result.mDealer = newDealer()
+    result.mStratHard = seqToMap(stratHard)
+    result.mStratSoft = seqToMap(stratSoft)
+    result.mStratSplit = seqToMap(stratSplit)
 
     for i in 0..<numPlayers:
         result.mPlayers.add(newPlayer(result))
@@ -297,20 +301,6 @@ proc dealerPlay(self: Table) =
                 self.print()
         self.finishRound()
 
-
-
-proc autoPlay(self: Table) =
-    #TODO: implement strategy
-    while self.mPlayers[self.mCurrentPlayer].mValue < 17:
-        self.hit()
-    
-    # Nextplayer inline
-    self.mCurrentPlayer += 1
-    if self.mCurrentPlayer < self.mPlayers.len()-1:
-        self.autoPlay()
-    else:
-        self.dealerPlay()
-
 proc action(self: Table, act: string) =
     case act:
         of "H":
@@ -324,6 +314,34 @@ proc action(self: Table, act: string) =
         else:
             echo "No action found"
             quit(1)
+
+proc autoPlay(self: Table) =
+    while not self.mPlayers[self.mCurrentPlayer].mIsDone:
+        # Player just split
+        if self.mPlayers[self.mCurrentPlayer].mHand.len() == 1:
+            self.deal()
+            self.mPlayers[self.mCurrentPlayer].evaluate()
+        if self.mPlayers[self.mCurrentPlayer].mHand.len() < 5 and self.mPlayers[self.mCurrentPlayer].mValue < 21:
+            var splitCardVal = self.mPlayers[self.mCurrentPlayer].canSplit()
+            if splitCardVal == 11:
+                self.splitAces()
+            elif splitCardVal != 0 and splitCardVal != 5 and splitCardVal != 10:
+                self.action(getAction(splitCardVal, self.mDealer.upCard(), self.mStratSplit))
+            elif self.mPlayers[self.mCurrentPlayer].mIsSoft:
+                self.action(getAction(self.mPlayers[self.mCurrentPlayer].mValue, self.mDealer.upCard(), self.mStratSoft))
+            else:
+                self.action(getAction(self.mPlayers[self.mCurrentPlayer].mValue, self.mDealer.upCard(), self.mStratHard))
+        else:
+            self.stand()
+
+    # Nextplayer inline
+    self.mCurrentPlayer += 1
+    if self.mCurrentPlayer < self.mPlayers.len():
+        self.autoPlay()
+    else:
+        self.dealerPlay()
+
+
 
 proc checkPlayerNatural(self: Table) =
     for player in self.mPlayers:

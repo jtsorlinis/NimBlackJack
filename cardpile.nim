@@ -1,14 +1,17 @@
 import card
 import deck
 import random
+import xorshift
+import times
 
 type CardPile* = ref object
     mCards*: seq[Card]
     mOriginalCards: seq[Card]
+    rnd: Xorshift64StarState
 
 proc newCardPile*(numofdecks: int32): CardPile =
-    randomize()
     new result
+    result.rnd.x = uint64(getTime().toUnix())
     for x in 0..<numofdecks:
         let temp = newDeck()
         result.mCards.add(temp.mCards)
@@ -25,5 +28,5 @@ proc print*(self: CardPile): string =
 
 proc shuffle*(self: CardPile) =
     for i in 0..<self.mCards.len:
-        let j = rand(i)
+        let j = uint32(self.rnd.next()) mod uint32(i+1)
         self.mCards[i].swap(self.mCards[j])

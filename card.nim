@@ -32,7 +32,7 @@ proc newCard*(rank: string, suit: string): Card =
     result.mFaceDown = false
     result.mValue = result.evaluate()
     result.mCount = result.count()
-    result.mIsAce = false
+    result.mIsAce = rank == "A"
 
 proc print*(self: Card): string =
     if self.mFaceDown:

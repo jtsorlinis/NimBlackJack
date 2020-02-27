@@ -2,7 +2,6 @@ import os, strutils
 import playertable
 import cardpile
 import times
-import strategies
 
 let numOfPlayers: int32 = 5
 let numOfDecks: int32 = 8

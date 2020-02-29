@@ -1,16 +1,21 @@
 import card
 import deck
-import xorshift
 import times
+
+var seed: uint32 = uint32(getTime().toUnix())
 
 type CardPile* = ref object
     mCards*: seq[Card]
     mOriginalCards: seq[Card]
-    rnd: Xorshift64StarState
+
+proc xorShift(): uint32 =
+    seed = seed xor (seed shl 13)
+    seed = seed xor (seed shr 17)
+    seed = seed xor (seed shl 5)
+    return seed
 
 proc newCardPile*(numofdecks: int32): CardPile =
     new result
-    result.rnd.x = uint64(getTime().toUnix())
     for x in 0..<numofdecks:
         let temp = newDeck()
         result.mCards.add(temp.mCards)
@@ -27,5 +32,5 @@ proc print*(self: CardPile): string =
 
 proc shuffle*(self: CardPile) =
     for i in 0..<self.mCards.len:
-        let j = uint32(self.rnd.next()) mod uint32(i+1)
+        let j = xorShift() mod uint32(i+1)
         self.mCards[i].swap(self.mCards[j])

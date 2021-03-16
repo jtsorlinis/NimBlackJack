@@ -1,4 +1,4 @@
 To run, fastest speed:
 
 ```
-nim c -d=danger --gc=markandsweep -t=-flto --run main
+nim r -d:danger --gc=arc -t=-flto main.nim

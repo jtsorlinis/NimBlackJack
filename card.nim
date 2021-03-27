@@ -1,6 +1,6 @@
 import strutils
 
-type Card* = ref object
+type Card* = object
     mRank*: string
     mSuit: string
     mFaceDown*: bool
@@ -26,7 +26,6 @@ proc count(self: Card): int32 =
         result = 1
 
 proc newCard*(rank: string, suit: string): Card =
-    new result
     result.mRank = rank
     result.mSuit = suit
     result.mFaceDown = false

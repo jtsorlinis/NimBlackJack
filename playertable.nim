@@ -24,7 +24,7 @@ type
 
     Player* = ref object of RootObj
         mTable: Table
-        mHand: seq[Card]
+        mHand: seq[ptr Card]
         mSplitFrom: Player
         mAces: int32
         mSplitcount: int32
@@ -106,7 +106,7 @@ proc lose(self: Player) =
 proc print*(self: Player): string =
     var output = "Player " & self.mPlayerNum & ": "
     for card in self.mHand:
-        output.add(card.print() & " ")
+        output.add(card[].print() & " ")
     for i in self.mHand.len()..<5:
         output.add("  ")
     output.add("\tScore: " & $self.mValue)

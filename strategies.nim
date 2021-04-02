@@ -46,16 +46,16 @@ let stratSplit* = @[
 @["9", "P", "P", "P", "P", "P", "S", "P", "P", "S", "S"],
 @["11", "P", "P", "P", "P", "P", "P", "P", "P", "P", "P"]]
 
-proc getAction*(playerVal: int32, dealerVal: int32, strategy: seq[string]): string =
+proc getAction*(playerVal: int32, dealerVal: int32, strategy: seq[char]): char =
     let key = (playerVal + dealerVal) * (playerVal + dealerVal + 1) div 2 + dealerVal
     return strategy[key]
 
-proc seqToMap*(arr: seq[seq[string]]): seq[string] =
-    var temp = newSeq[string](1000)
+proc seqToMap*(arr: seq[seq[string]]): seq[char] =
+    var temp = newSeq[char](1000)
     for row in 0..<arr.len():
         for col in 0..<arr[0].len():
             var playerVal = parseInt(arr[row][0])
             var dealerVal = parseInt(arr[0][col])
             var key = (playerVal + dealerVal) * (playerVal + dealerVal + 1) div 2 + dealerVal;
-            temp[key] = arr[row][col];
+            temp[key] = arr[row][col][0];
     return temp

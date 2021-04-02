@@ -10,9 +10,9 @@ type
         mDealer: Dealer
         mMincards: int32
         mNumOfDecks: int32
-        mStratHard: seq[string]
-        mStratSoft: seq[string]
-        mStratSplit: seq[string]
+        mStratHard: seq[char]
+        mStratSoft: seq[char]
+        mStratSplit: seq[char]
         mVerbose: bool
         mBetSize*: int32
         mCardPile*: CardPile
@@ -42,6 +42,7 @@ type
 # Dealer Methods
 proc newDealer(): Dealer =
     new result
+    result.mHand = newSeqOfCap[ptr Card](5)
     result.mPlayerNum = "D"
     result.mValue = 0
 
@@ -55,6 +56,7 @@ proc upCard(self: Dealer): int32 =
 # Player Methods
 proc newPlayer*(table: Table = nil, split: Player = nil): Player =
     new result
+    result.mHand = newSeqOfCap[ptr Card](5)
     result.mTable = table
     if table == nil:
         return
@@ -83,7 +85,7 @@ proc resetHand*(self: Player) =
     self.mInitialBet = self.mTable.mBetSize
 
 proc canSplit(self: Player): int32 =
-    if self.mHand.len() == 2 and self.mHand[0].mRank == self.mHand[1].mRank and
+    if self.mHand.len() == 2 and self.mHand[0].mRank[0] == self.mHand[1].mRank[0] and
             self.mSplitcount < maxSplits:
         return self.mHand[0].mValue
     return 0
@@ -301,15 +303,15 @@ proc dealerPlay(self: Table) =
                 self.print()
         self.finishRound()
 
-proc action(self: Table, act: string) =
+proc action(self: Table, act: char) =
     case act:
-        of "H":
+        of 'H':
             self.hit()
-        of "S":
+        of 'S':
             self.stand()
-        of "D":
+        of 'D':
             self.doubleBet()
-        of "P":
+        of 'P':
             self.split()
         else:
             echo "No action found"

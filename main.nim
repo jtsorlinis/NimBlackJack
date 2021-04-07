@@ -1,4 +1,5 @@
 import os, strutils
+import strformat
 import playertable
 import cardpile
 import times
@@ -34,7 +35,7 @@ t.clear()
 for player in t.mPlayers:
     let winperc = 50 + player.mEarnings / float32(rounds * betSize) * 50
     echo "Player " & player.mPlayerNum & " earnings: " & $player.mEarnings &
-            "\t\tWin Percentage: " & $winperc & "%"
+            "\t\tWin Percentage: " & fmt"{winperc:<.2f}" & "%"
 
 echo "Casino earnings: " & $t.mCasinoEarnings
 echo "Played " & $rounds & " rounds in " & $(cpuTime()-start) & " seconds"

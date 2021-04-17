@@ -49,6 +49,6 @@ proc print*(self: CardPile): string =
         result.add(card[].print())
 
 proc shuffle*(self: CardPile) =
-    for i in 0..<self.mCards.len:
+    for i in countdown(self.mCards.len-1, 1):
         let j = pcg32Range(uint32(i+1))
         self.mCards[i].swap(self.mCards[j])

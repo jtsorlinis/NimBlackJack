@@ -65,6 +65,8 @@ proc newPlayer*(table: Table = nil, split: Player = nil): Player =
         result.mHand.add(split.mHand[1])
         result.mSplitcount += 1
         result.mPlayerNum = split.mPlayerNum & "S"
+        result.mBetMult = 1
+        result.mInitialBet = split.mInitialBet
         result.mSplitFrom = split
     else:
         playerNumCount += 1
@@ -91,19 +93,14 @@ proc canSplit(self: Player): int32 =
     return 0
 
 proc win(self: Player, mult: float32 = 1) =
-    if self.mSplitFrom != nil:
-        self.mSplitFrom.win(mult)
-    else:
-        self.mEarnings += float32(self.mInitialBet) * self.mBetMult * mult
-        self.mTable.mCasinoEarnings -= float32(self.mInitialBet) *
-                self.mBetMult * mult
+    let x = float32(self.mInitialBet) * self.mBetMult * mult
+    self.mEarnings += x
+    self.mTable.mCasinoEarnings -= x
 
 proc lose(self: Player) =
-    if self.mSplitFrom != nil:
-        self.mSplitFrom.lose()
-    else:
-        self.mEarnings -= float32(self.mInitialBet) * self.mBetMult
-        self.mTable.mCasinoEarnings += float32(self.mInitialBet) * self.mBetMult
+    let x = float32(self.mInitialBet) * self.mBetMult
+    self.mEarnings -= x
+    self.mTable.mCasinoEarnings += x
 
 proc print*(self: Player): string =
     var output = "Player " & self.mPlayerNum & ": "
@@ -201,9 +198,11 @@ proc getNewCards(self: Table) =
 
 proc clear*(self: Table) =
     for i in countdown(self.mPlayers.len()-1, 0):
-        self.mPlayers[i].resetHand()
         if self.mPlayers[i].mSplitFrom != nil:
+            self.mPlayers[i-1].mEarnings += self.mPlayers[i].mEarnings
             self.mPlayers.delete(i)
+        else:
+            self.mPlayers[i].resetHand()
     self.mDealer.resetHand()
     self.mCurrentPlayer = 0
 

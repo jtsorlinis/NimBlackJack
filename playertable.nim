@@ -85,8 +85,8 @@ proc resetHand*(self: Player) =
     self.mInitialBet = self.mTable.mBetSize
 
 proc canSplit(self: Player): int32 =
-    if self.mHand.len() == 2 and self.mHand[0].mRank[0] == self.mHand[1].mRank[0] and
-            self.mSplitcount < maxSplits:
+    if self.mHand.len() == 2 and self.mHand[0].mRank[0] == self.mHand[1].mRank[
+            0] and self.mSplitcount < maxSplits:
         return self.mHand[0].mValue
     return 0
 
@@ -134,7 +134,6 @@ proc evaluate*(self: Player) =
         self.mValue -= 10
         self.mAces -= 1
     self.mIsSoft = self.mAces != 0
-
 
 # Table methods
 proc newTable*(numPlayers: int32, numDecks: int32, betSize: int32,
@@ -197,7 +196,8 @@ proc getNewCards(self: Table) =
     self.mTruecount = 0
     self.mRunningcount = 0
     if self.mVerbose:
-        echo "Got " & $self.mNumOfDecks & " new decks as number of cards left is below " & $self.mMincards
+        echo "Got " & $self.mNumOfDecks &
+                " new decks as number of cards left is below " & $self.mMincards
 
 proc clear*(self: Table) =
     for i in countdown(self.mPlayers.len()-1, 0):
@@ -206,11 +206,11 @@ proc clear*(self: Table) =
             self.mPlayers.delete(i)
     self.mDealer.resetHand()
     self.mCurrentPlayer = 0
-            
 
 proc updateCount(self: Table) =
     if self.mCardPile.mCards.len() > 51:
-        self.mTruecount = self.mRunningcount div int32(self.mCardPile.mCards.len() div 52)
+        self.mTruecount = self.mRunningcount div int32(
+                self.mCardPile.mCards.len() div 52)
 
 proc hit(self: Table) =
     self.deal()
@@ -223,7 +223,6 @@ proc stand(self: Table) =
         echo "Player " & self.mPlayers[self.mCurrentPlayer].mPlayerNum & " stands"
         self.print()
     self.mPlayers[self.mCurrentPlayer].mIsDone = true
-
 
 proc split(self: Table) =
     var splitPlayer = newPlayer(self, self.mPlayers[self.mCurrentPlayer])
@@ -249,10 +248,10 @@ proc splitAces(self: Table) =
     self.stand()
     if self.mVerbose:
         self.print()
-    
 
 proc doubleBet(self: Table) =
-    if self.mPlayers[self.mCurrentPlayer].mBetMult == 1 and self.mPlayers[self.mCurrentPlayer].mHand.len() == 2:
+    if self.mPlayers[self.mCurrentPlayer].mBetMult == 1 and self.mPlayers[
+            self.mCurrentPlayer].mHand.len() == 2:
         self.mPlayers[self.mCurrentPlayer].doubleBet()
         if self.mVerbose:
             echo "Player " & self.mPlayers[self.mCurrentPlayer].mPlayerNum & " doubles"
@@ -275,7 +274,6 @@ proc finishRound(self: Table) =
             discard
         else:
             player.lose()
-
 
 proc dealerPlay(self: Table) =
     var allBusted = true
@@ -323,16 +321,20 @@ proc autoPlay(self: Table) =
         if self.mPlayers[self.mCurrentPlayer].mHand.len() == 1:
             self.deal()
             self.mPlayers[self.mCurrentPlayer].evaluate()
-        if self.mPlayers[self.mCurrentPlayer].mHand.len() < 5 and self.mPlayers[self.mCurrentPlayer].mValue < 21:
+        if self.mPlayers[self.mCurrentPlayer].mHand.len() < 5 and self.mPlayers[
+                self.mCurrentPlayer].mValue < 21:
             var splitCardVal = self.mPlayers[self.mCurrentPlayer].canSplit()
             if splitCardVal == 11:
                 self.splitAces()
             elif splitCardVal != 0 and splitCardVal != 5 and splitCardVal != 10:
-                self.action(getAction(splitCardVal, self.mDealer.upCard(), self.mStratSplit))
+                self.action(getAction(splitCardVal, self.mDealer.upCard(),
+                        self.mStratSplit))
             elif self.mPlayers[self.mCurrentPlayer].mIsSoft:
-                self.action(getAction(self.mPlayers[self.mCurrentPlayer].mValue, self.mDealer.upCard(), self.mStratSoft))
+                self.action(getAction(self.mPlayers[self.mCurrentPlayer].mValue,
+                        self.mDealer.upCard(), self.mStratSoft))
             else:
-                self.action(getAction(self.mPlayers[self.mCurrentPlayer].mValue, self.mDealer.upCard(), self.mStratHard))
+                self.action(getAction(self.mPlayers[self.mCurrentPlayer].mValue,
+                        self.mDealer.upCard(), self.mStratHard))
         else:
             self.stand()
 
@@ -343,11 +345,10 @@ proc autoPlay(self: Table) =
     else:
         self.dealerPlay()
 
-
-
 proc checkPlayerNatural(self: Table) =
     for player in self.mPlayers:
-        if player.mValue == 21 and player.mHand.len() == 2 and player.mSplitFrom == nil:
+        if player.mValue == 21 and player.mHand.len() == 2 and
+                player.mSplitFrom == nil:
             player.mHasNatural = true
 
 proc checkDealerNatural(self: Table): bool =
@@ -369,7 +370,6 @@ proc checkEarnings*(self: Table) =
         return
     echo "Earnings don't match"
     quit(1)
-
 
 proc startRound*(self: Table) =
     self.clear()

@@ -2,7 +2,7 @@ import card
 import deck
 import times
 
-var state: uint64 = uint32(getTime().toUnix())
+var state: uint64 = uint64(getTime().toUnix())
 
 type CardPile* = ref object
     mCards*: seq[ptr Card]
@@ -12,9 +12,9 @@ type CardPile* = ref object
 proc pcg32(): uint32 =
     let oldstate = state
     state = oldstate * 6364136223846793005'u64 + 1
-    let xorshifted = ((oldstate shr 18) xor oldstate) shr 27
-    let rot = oldstate shr 59
-    return uint32((xorshifted shr rot) or (xorshifted shl (uint32(-(int32(rot))) and 31)))
+    let xorshifted = (((oldState shr 18) xor oldState) shr 27).uint32
+    let rot = (oldState shr 59).uint32
+    return (xorshifted shr rot) or (xorshifted shl ((0'u32 - rot) and 31))
 
 # From https://github.com/lemire/FastShuffleExperiments
 proc pcg32Range(s: uint32): uint32 =
@@ -28,7 +28,7 @@ proc pcg32Range(s: uint32): uint32 =
             m = uint64(x) * uint64(s)
             l = uint64(m)
     return uint32(m shr 32)
-            
+
 
 proc refresh*(self: CardPile) =
     self.mCards.setLen(0)

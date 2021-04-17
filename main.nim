@@ -1,5 +1,4 @@
 import os, strutils
-import strformat
 import playertable
 import cardpile
 import times

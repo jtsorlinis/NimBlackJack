@@ -146,6 +146,7 @@ proc newTable*(numPlayers: int32, numDecks: int32, betSize: int32,
     result.mStratSoft = seqToMap(stratSoft)
     result.mStratSplit = seqToMap(stratSplit)
 
+    result.mPlayers = newSeqOfCap[Player](numPlayers * 3)
     for i in 0..<numPlayers:
         result.mPlayers.add(newPlayer(result))
 
